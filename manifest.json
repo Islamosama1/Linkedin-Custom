@@ -3,15 +3,26 @@
     "name": "LinkedIn Job Highlighter",
     "version": "4.0",
     "description": "Highlights keywords on LinkedIn Jobs pages.",
-    "permissions": ["scripting", "webNavigation", "activeTab", "storage"],
-    "host_permissions": ["https://www.linkedin.com/jobs/*"],
+    "permissions": [
+        "scripting",
+        "webNavigation",
+        "activeTab",
+        "storage"
+    ],
+    "host_permissions": [
+        "https://www.linkedin.com/jobs/*"
+    ],
     "background": {
         "service_worker": "background.js"
     },
     "content_scripts": [
         {
-            "matches": ["https://www.linkedin.com/jobs/*"],
-            "js": ["content.js"],
+            "matches": [
+                "https://www.linkedin.com/jobs/*"
+            ],
+            "js": [
+                "content.js"
+            ],
             "run_at": "document_end"
         }
     ],
