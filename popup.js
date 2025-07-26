@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /**
    * Function to add multiple keywords.
    * - Splits input by commas, trims whitespace, and removes empty entries.
-   * - Creates a checkbox for each keyword.
+  //  * - Creates a checkbox for each keyword.
    * - Appends each checkbox to the keywords container.
    */
   function addKeywords() {

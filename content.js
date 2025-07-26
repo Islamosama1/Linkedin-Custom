@@ -1,3 +1,4 @@
+// Initialize global observer variables
 if (!window.domObserver) {
   window.domObserver = null;
 }
@@ -5,74 +6,77 @@ if (!window.domObserver) {
 if (!window.jobDescriptionObserver) {
   window.jobDescriptionObserver = null;
 }
+
+// ===============================
+// SINGLE INITIALIZATION BLOCK
+// ===============================
 if (!window.isContentScriptInitialized) {
   window.isContentScriptInitialized = true;
 
-  // Final Initialization Logic
+  // Initialize everything once
   chrome.storage.local.get(['keywords'], (result) => {
     const keywords = result.keywords || [];
 
-    highlightJobs(keywords); // Initial highlights for job cards
-    observeDOMChanges(); // Monitor job list dynamically
-    monitorJobDescription(keywords); // Monitor and highlight job descriptions
+    // Initialize all functionality
+    highlightJobs(keywords);
+    observeDOMChanges();
+    monitorJobDescription(keywords);
   });
-  // Listen for Keyword Updates
+
+  // Listen for keyword updates
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.keywords) {
-      highlightKeywords(message.keywords); // Apply updated highlights
-      highlightJobs(message.keywords); // Apply updated job card highlights
+      highlightKeywords(message.keywords);
+      highlightJobs(message.keywords);
       sendResponse({ status: 'success', keywords: message.keywords });
     } else {
       sendResponse({ status: 'error', message: 'No keywords provided.' });
     }
   });
 }
+
 // ===============================
 // Observe DOM Changes for Job Cards
 // ===============================
-// Updated Observe DOM Changes function
 function observeDOMChanges() {
-  const targetNode = document.body; // Monitor the entire page for changes
+  const targetNode = document.body;
   const observerConfig = { childList: true, subtree: true };
 
-  // Disconnect and reset the existing observer if it's already active
+  // Disconnect existing observer to prevent duplicates
   if (window.domObserver) {
     window.domObserver.disconnect();
   }
 
-  window.domObserver = new MutationObserver(() => {
-    // Get current keywords from storage for both job description and title highlighting
+  window.domObserver = new MutationObserver(debounce(() => {
     chrome.storage.local.get(['keywords'], (result) => {
       const keywords = result.keywords || [];
-      highlightJobs(keywords); // Reapply highlights when the DOM changes
+      highlightJobs(keywords);
     });
-  });
+  }, 100)); // Debounce to reduce frequency
 
   window.domObserver.observe(targetNode, observerConfig);
 }
+
 // ===============================
 // Detect LinkedIn Dark Mode
 // ===============================
 function isLinkedInDarkMode() {
   const htmlClassList = document.documentElement.classList;
-  return htmlClassList.contains('theme--dark-lix'); // LinkedIn dark mode indicator
+  return htmlClassList.contains('theme--dark-lix');
 }
+
 // ===============================
-// Highlight Job Cards Based on State
-// ===============================
-// ===============================
-// Updated Highlight Job Cards
+// Highlight Job Cards Based on Keywords
 // ===============================
 function highlightJobs(keywords = []) {
-  const jobCards = document.querySelectorAll('.job-card-container'); // Select all job cards
-  const darkMode = isLinkedInDarkMode(); // Detect if dark mode is active
+  const jobCards = document.querySelectorAll('.job-card-container');
+  const darkMode = isLinkedInDarkMode();
 
   jobCards.forEach((jobCard) => {
     // Try multiple selectors to find the job title
     let titleElement = null;
     let titleText = '';
 
-    // Try different possible selectors for job titles
     const titleSelectors = [
       '.artdeco-entity-lockup__title a span[aria-hidden="true"]',
       '.artdeco-entity-lockup__title a',
@@ -95,7 +99,7 @@ function highlightJobs(keywords = []) {
       }
     }
 
-    // Check if job title contains any of the user's keywords
+    // Check if job title contains any keywords
     const shouldHighlight = keywords.some((keyword) =>
       titleText.toLowerCase().includes(keyword.toLowerCase().trim())
     );
@@ -103,16 +107,16 @@ function highlightJobs(keywords = []) {
     const jobStateElement = jobCard.querySelector(
       '.job-card-container__footer-job-state'
     );
-    const jobState = jobStateElement ? jobStateElement.textContent.trim() : ''; // Get the job state text, or empty string if no state
+    const jobState = jobStateElement ? jobStateElement.textContent.trim() : '';
 
-    // FIRST: Reset all styles
+    // Reset all styles first
     jobCard.style.backgroundColor = '';
     jobCard.style.border = '';
     jobCard.style.borderRadius = '';
     jobCard.style.filter = '';
     jobCard.style.opacity = '';
 
-    // SECOND: Apply blur/grayscale for viewed/saved/applied jobs
+    // Apply blur/grayscale for viewed/saved/applied jobs
     const isViewedSavedOrApplied =
       jobState === 'Viewed' || jobState === 'Saved' || jobState === 'Applied';
     if (isViewedSavedOrApplied) {
@@ -120,17 +124,14 @@ function highlightJobs(keywords = []) {
       jobCard.style.opacity = '0.7';
     }
 
+    // Highlight matching jobs that aren't viewed/saved/applied
     if (shouldHighlight && keywords.length > 0 && !isViewedSavedOrApplied) {
-      const matchedKeywords = keywords.filter((keyword) =>
-        titleText.toLowerCase().includes(keyword.toLowerCase().trim())
-      );
-
-      jobCard.style.backgroundColor = "rgba(200, 230, 201, 0.8)"; // Soft mint green
-      jobCard.style.border = "2px solid #A5D6A7"; // Lighter, pastel green
-      jobCard.style.borderRadius = "8px"; // Rounded corners
+      jobCard.style.backgroundColor = "rgba(200, 230, 201, 0.8)";
+      jobCard.style.border = "2px solid #A5D6A7";
+      jobCard.style.borderRadius = "8px";
     }
 
-    // Apply dark/light mode styling to additional job card elements
+    // Apply dark/light mode styling
     const title = jobCard.querySelector('.artdeco-entity-lockup__title');
     if (title) title.style.color = darkMode ? 'white' : 'black';
 
@@ -160,80 +161,14 @@ function highlightJobs(keywords = []) {
 
     if (jobStateElement) {
       jobStateElement.style.color = darkMode ? 'white' : 'black';
-      jobStateElement.style.fontWeight = 'bold'; // Bold styling for job state
+      jobStateElement.style.fontWeight = 'bold';
     }
   });
 }
-// Highlight keywords in a specific element
-function highlightKeywordsInElement(element, keywords) {
-  if (!element || keywords.length === 0) return;
 
-  // Clear existing highlights
-  clearHighlights();
-
-  const escapedKeywords = keywords.map((keyword) =>
-    keyword.replace(/([.*+?^${}()|[\]\\])/g, '\\$1').trim()
-  );
-  const regexPattern = new RegExp(`\\b(${escapedKeywords.join('|')})\\b`, 'gi');
-
-  function processNode(node) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      const matches = node.nodeValue.match(regexPattern);
-      if (matches) {
-        const fragment = document.createDocumentFragment();
-        let lastIndex = 0;
-
-        matches.forEach((match) => {
-          const matchIndex = node.nodeValue.indexOf(match, lastIndex);
-
-          if (matchIndex > lastIndex) {
-            fragment.appendChild(
-              document.createTextNode(
-                node.nodeValue.slice(lastIndex, matchIndex)
-              )
-            );
-          }
-
-          const span = document.createElement('span');
-          span.className = 'highlight';
-          span.style.backgroundColor = 'yellow';
-          span.style.color = 'black';
-          span.textContent = match;
-          fragment.appendChild(span);
-
-          lastIndex = matchIndex + match.length;
-        });
-
-        if (lastIndex < node.nodeValue.length) {
-          fragment.appendChild(
-            document.createTextNode(node.nodeValue.slice(lastIndex))
-          );
-        }
-
-        node.replaceWith(fragment);
-      }
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-      Array.from(node.childNodes).forEach((child) => processNode(child));
-    }
-  }
-
-  Array.from(element.childNodes).forEach((child) => processNode(child));
-}
-
-function observeJobChanges() {
-  const targetNode = document.querySelector('.jobs-search-results-list');
-  if (!targetNode) return;
-
-  const observer = new MutationObserver(() => {
-    // Fetch stored keywords and re-monitor the job description
-    chrome.storage.local.get(['keywords'], (result) => {
-      const keywords = result.keywords || [];
-      monitorJobDescription(keywords); // Monitor the new job description container
-    });
-  });
-
-  observer.observe(targetNode, { childList: true, subtree: true });
-}
+// ===============================
+// Utility Functions
+// ===============================
 function waitForElement(selector, callback, interval = 100, timeout = 5000) {
   const startTime = Date.now();
 
@@ -273,12 +208,12 @@ function clearHighlights() {
         document.createTextNode(highlightedSpan.textContent),
         highlightedSpan
       );
-      parent.normalize(); // Merge adjacent text nodes
+      parent.normalize();
     });
 }
 
 // ===============================
-// Highlight Selected Keywords in Job Descriptions
+// Highlight Keywords in Job Descriptions
 // ===============================
 function highlightKeywords(keywords) {
   const jobDescriptionContainer = document.querySelector(
@@ -286,17 +221,15 @@ function highlightKeywords(keywords) {
   );
   if (!jobDescriptionContainer || !keywords || keywords.length === 0) return;
 
-  // Clear existing highlights
   clearHighlights();
 
-  // Escape special characters in keywords for regex
   const escapedKeywords = keywords.map((keyword) =>
     keyword.replace(/([.*+?^${}()|[\]\\])/g, '\\$1').trim()
   );
 
   const regexPattern = new RegExp(`\\b(${escapedKeywords.join('|')})\\b`, 'gi');
 
-  // Define keywords for green highlighting
+  // Keywords for green highlighting
   const greenKeywords = [
     'U.S. Security Clearance',
     'Clearance',
@@ -312,7 +245,6 @@ function highlightKeywords(keywords) {
     'gi'
   );
 
-  // Highlight text nodes recursively
   function processNode(node) {
     if (node.nodeType === Node.TEXT_NODE) {
       const matches = node.nodeValue.match(regexPattern);
@@ -335,10 +267,10 @@ function highlightKeywords(keywords) {
           span.className = 'highlight';
 
           if (greenKeywordsRegex.test(match)) {
-            span.style.backgroundColor = 'green'; // Green for specific keywords
+            span.style.backgroundColor = 'green';
             span.style.color = 'white';
           } else {
-            span.style.backgroundColor = 'yellow'; // Yellow for others
+            span.style.backgroundColor = 'yellow';
             span.style.color = 'black';
           }
           span.textContent = match;
@@ -364,67 +296,35 @@ function highlightKeywords(keywords) {
     processNode(child)
   );
 }
+
 // ===============================
 // Monitor Job Descriptions for Changes
 // ===============================
 function monitorJobDescription(keywords) {
-  // Wait for the "About the job" container
   waitForElement(
     '.jobs-box__html-content',
     (jobDescriptionContainer) => {
-      // Disconnect any existing observer
+      // Disconnect existing observer to prevent duplicates
       if (window.jobDescriptionObserver) {
         window.jobDescriptionObserver.disconnect();
       }
 
-      // Create a new observer for the job description
+      // Create new observer with debouncing
       window.jobDescriptionObserver = new MutationObserver(
         debounce(() => {
-          highlightKeywords(keywords); // Apply keyword highlights
+          highlightKeywords(keywords);
         }, 300)
-      ); // Debounce by 300ms
+      );
 
-      // Observe the container for changes
       window.jobDescriptionObserver.observe(jobDescriptionContainer, {
         childList: true,
         subtree: true,
       });
 
-      // Apply highlights initially
+      // Apply initial highlights
       highlightKeywords(keywords);
     },
     100,
     10000
-  ); // Wait up to 10 seconds for the container
+  );
 }
-// ===============================
-// Final Initialization
-// ===============================
-chrome.storage.local.get(['keywords'], (result) => {
-  const keywords = result.keywords || [];
-  // Initialize observers and highlights
-  highlightJobs(keywords); // Initial highlights for job cards
-  observeDOMChanges(); // Monitor job list dynamically
-  monitorJobDescription(keywords); // Monitor and highlight job descriptions
-});
-// ===============================
-// Listen for Keyword Updates
-// ===============================
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.keywords) {
-    highlightKeywords(message.keywords); // Apply updated highlights to job descriptions
-    highlightJobs(message.keywords); // Apply updated highlights to job cards
-    sendResponse({ status: 'success', keywords: message.keywords });
-  } else {
-    sendResponse({ status: 'error', message: 'No keywords provided.' });
-  }
-});
-// ===============================
-// Initialize Observers and Highlights
-// ===============================
-observeDOMChanges();
-observeJobChanges();
-chrome.storage.local.get(['keywords'], (result) => {
-  const keywords = result.keywords || [];
-  highlightJobs(keywords);
-});
