@@ -123,8 +123,11 @@ function highlightJobs(keywords = []) {
                 titleText.toLowerCase().includes(keyword.toLowerCase().trim())
             );
 
-            jobCard.style.backgroundColor = "rgba(146, 11, 11, 0.8)"; // Darker red background
-            jobCard.style.border = "2px solid red"; // Red border
+            // jobCard.style.backgroundColor = "rgba(20, 134, 9, 0.8)"; // Darker red background
+            // jobCard.style.border = "2px solid green"; // Red border
+            jobCard.style.backgroundColor = "rgba(200, 230, 201, 0.8)"; // Soft mint green
+            jobCard.style.border = "2px solid #A5D6A7"; // Lighter, pastel green
+
             jobCard.style.borderRadius = "8px"; // Rounded corners
         }
 
