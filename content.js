@@ -117,14 +117,14 @@ function highlightJobs(keywords = []) {
             jobCard.style.opacity = "0.7";
         }
 
-        // THIRD: Apply red highlighting for jobs matching user's keywords (only if NOT viewed/saved/applied)
+        // THIRD: Apply green highlighting for jobs matching user's keywords (only if NOT viewed/saved/applied)
         if (shouldHighlight && keywords.length > 0 && !isViewedSavedOrApplied) {
             const matchedKeywords = keywords.filter(keyword =>
                 titleText.toLowerCase().includes(keyword.toLowerCase().trim())
             );
 
-            jobCard.style.backgroundColor = "rgba(146, 11, 11, 0.8)"; // Darker red background
-            jobCard.style.border = "2px solid red"; // Red border
+            jobCard.style.backgroundColor = "rgba(11, 146, 11, 0.8)"; // Darker green background
+            jobCard.style.border = "2px solid green"; // Green border
             jobCard.style.borderRadius = "8px"; // Rounded corners
         }
 
@@ -273,9 +273,9 @@ function highlightKeywords(keywords) {
 
     const regexPattern = new RegExp(`\\b(${escapedKeywords.join('|')})\\b`, 'gi');
 
-    // Define keywords for red highlighting
-    const redKeywords = ['U.S. Security Clearance', 'Clearance', 'Secret', 'Citizen', 'GC', 'Citizenship'];
-    const redKeywordsRegex = new RegExp(`\\b(${redKeywords.map((k) => k.replace(/([.*+?^${}()|[\]\\])/g, '\\$1')).join('|')})\\b`, 'gi');
+    // Define keywords for green highlighting
+    const greenKeywords = ['U.S. Security Clearance', 'Clearance', 'Secret', 'Citizen', 'GC', 'Citizenship'];
+    const greenKeywordsRegex = new RegExp(`\\b(${greenKeywords.map((k) => k.replace(/([.*+?^${}()|[\]\\])/g, '\\$1')).join('|')})\\b`, 'gi');
 
     // Highlight text nodes recursively
     function processNode(node) {
@@ -295,8 +295,8 @@ function highlightKeywords(keywords) {
                     const span = document.createElement('span');
                     span.className = 'highlight';
 
-                    if (redKeywordsRegex.test(match)) {
-                        span.style.backgroundColor = 'red'; // Red for specific keywords
+                    if (greenKeywordsRegex.test(match)) {
+                        span.style.backgroundColor = 'green'; // Green for specific keywords
                         span.style.color = 'white';
                     } else {
                         span.style.backgroundColor = 'yellow'; // Yellow for others
