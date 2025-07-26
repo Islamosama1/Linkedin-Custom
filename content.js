@@ -120,15 +120,14 @@ function highlightJobs(keywords = []) {
       jobCard.style.opacity = '0.7';
     }
 
-    // THIRD: Apply green highlighting for jobs matching user's keywords (only if NOT viewed/saved/applied)
     if (shouldHighlight && keywords.length > 0 && !isViewedSavedOrApplied) {
       const matchedKeywords = keywords.filter((keyword) =>
         titleText.toLowerCase().includes(keyword.toLowerCase().trim())
       );
 
-      jobCard.style.backgroundColor = 'rgba(11, 146, 11, 0.8)'; // Darker green background
-      jobCard.style.border = '2px solid green'; // Green border
-      jobCard.style.borderRadius = '8px'; // Rounded corners
+      jobCard.style.backgroundColor = "rgba(200, 230, 201, 0.8)"; // Soft mint green
+      jobCard.style.border = "2px solid #A5D6A7"; // Lighter, pastel green
+      jobCard.style.borderRadius = "8px"; // Rounded corners
     }
 
     // Apply dark/light mode styling to additional job card elements
