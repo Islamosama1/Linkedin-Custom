@@ -1,126 +1,130 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>LinkedIn Job Highlighter</title>
     <style>
-        /* General body styling */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            padding: 20px;
-            width: 300px;
-        }
+      /* General body styling */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        padding: 20px;
+        width: 300px;
+      }
 
-        /* Header styling */
-        h1 {
-            color: #0073b1;
-            font-size: 18px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
+      /* Header styling */
+      h1 {
+        color: #0073b1;
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 10px;
+      }
 
-        /* Keyword input styling */
-        #keyword-box {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
+      /* Keyword input styling */
+      #keyword-box {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
 
-        /* "Add" button styling */
-        #add-keyword-btn {
-            background-color: #0073b1;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+      /* "Add" button styling */
+      #add-keyword-btn {
+        background-color: #0073b1;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
 
-        /* "Add" button hover effect */
-        #add-keyword-btn:hover {
-            background-color: #005c99;
-        }
+      /* "Add" button hover effect */
+      #add-keyword-btn:hover {
+        background-color: #005c99;
+      }
 
-        /* Container for dynamically added keywords */
-        .keywords-container {
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: white;
-            padding: 10px;
-            margin-bottom: 15px;
-        }
+      /* Container for dynamically added keywords */
+      .keywords-container {
+        max-height: 150px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: white;
+        padding: 10px;
+        margin-bottom: 15px;
+      }
 
-        /* Individual keyword item styling */
-        .keyword-item {
-            margin-bottom: 8px;
-        }
+      /* Individual keyword item styling */
+      .keyword-item {
+        margin-bottom: 8px;
+      }
 
-        /* Buttons container styling */
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-        }
+      /* Buttons container styling */
+      .action-buttons {
+        display: flex;
+        justify-content: space-between;
+      }
 
-        /* Styling for action buttons (Apply Highlights and Reset) */
-        .action-buttons button {
-            flex: 1;
-            padding: 10px 0;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-        }
+      /* Styling for action buttons (Apply Highlights and Reset) */
+      .action-buttons button {
+        flex: 1;
+        padding: 10px 0;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+      }
 
-        /* "Apply Highlights" button styling */
-        .action-buttons button:first-child {
-            margin-right: 5px;
-            background-color: #0073b1;
-            color: white;
-        }
+      /* "Apply Highlights" button styling */
+      .action-buttons button:first-child {
+        margin-right: 5px;
+        background-color: #0073b1;
+        color: white;
+      }
 
-        /* "Apply Highlights" hover effect */
-        .action-buttons button:first-child:hover {
-            background-color: #005c99;
-        }
+      /* "Apply Highlights" hover effect */
+      .action-buttons button:first-child:hover {
+        background-color: #005c99;
+      }
 
-        /* "Reset" button styling */
-        .action-buttons button:last-child {
-            margin-left: 5px;
-            background-color: #d9534f;
-            color: white;
-        }
+      /* "Reset" button styling */
+      .action-buttons button:last-child {
+        margin-left: 5px;
+        background-color: #d9534f;
+        color: white;
+      }
 
-        /* "Reset" hover effect */
-        .action-buttons button:last-child:hover {
-            background-color: #c9302c;
-        }
+      /* "Reset" hover effect */
+      .action-buttons button:last-child:hover {
+        background-color: #c9302c;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Header Section -->
     <h1>LinkedIn Job Highlighter</h1>
     <p>Enter keywords (separated by commas) and click "Add" to save them:</p>
 
     <!-- Keyword Input -->
-    <input type="text" id="keyword-box" placeholder="Enter keywords, e.g., C, C++, Java">
+    <input
+      type="text"
+      id="keyword-box"
+      placeholder="Enter keywords, e.g., C, C++, Java"
+    />
     <button id="add-keyword-btn">Add</button>
 
     <!-- Container for dynamically added keywords -->
     <div class="keywords-container" id="keywords-container">
-        <!-- Dynamically added keyword checkboxes will appear here -->
+      <!-- Dynamically added keyword checkboxes will appear here -->
     </div>
 
     <!-- Action Buttons: Apply Highlights and Reset -->
     <div class="action-buttons">
-        <button id="apply-highlights-btn">Apply Highlights</button>
-        <button id="reset-btn">Reset</button>
+      <button id="apply-highlights-btn">Apply Highlights</button>
+      <button id="reset-btn">Reset</button>
     </div>
 
     <!-- Linking to the JavaScript logic for the popup -->
     <script src="popup.js"></script>
-</body>
+  </body>
 </html>
