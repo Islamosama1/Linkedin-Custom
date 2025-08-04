@@ -1,5 +1,5 @@
 {
-    "manifest_version": 4,
+    "manifest_version": 3,
     "name": "LinkedIn Job Highlighter",
     "version": "4.0",
     "description": "Highlights keywords on LinkedIn Jobs pages.",
